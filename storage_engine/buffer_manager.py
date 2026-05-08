@@ -7,18 +7,18 @@ class BufferPool:
         self.lru = [] 
         self.dirty = set() 
         
-    def  get_page(self, file, page_num):
+    def  get_page(self, file_path, page_num):
         if page_num in self.pages:
             self.lru.remove(page_num)
             self.lru.append(page_num)
             return self.pages[page_num]
         
-        page_bytes = read_page(file, page_num)
+        page_bytes = read_page(file_path, page_num)
         if len(self.pages) >= self.capacity:
             oldest = self.lru.pop(0)
             
             if oldest in self.dirty:
-                write_page(file, oldest, self.pages[oldest])
+                write_page(file_path, oldest, self.pages[oldest])
                 print(f"Flushed page {oldest} to disk")
                 self.dirty.remove(oldest)
             
@@ -31,12 +31,11 @@ class BufferPool:
 
 
     def mark_dirty(self, page_num):
-        if page_num in self.pages:
-            self.dirty.add(page_num)
+        self.dirty.add(page_num)
         
         
-    def flush_all(self, file):
+    def flush_all(self, file_path):
         for page_num in list(self.dirty):
-            write_page(file, page_num, self.pages[page_num])
+            write_page(file_path, page_num, self.pages[page_num])
             print(f"Flushed page {page_num} to disk")
         self.dirty.clear()
