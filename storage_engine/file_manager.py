@@ -2,6 +2,15 @@ import os
 
 from .page import init_page
 
+_disk_read_count = 0
+
+def reset_read_count():
+    global _disk_read_count
+    _disk_read_count = 0
+
+def get_read_count():
+    return _disk_read_count
+
 def  write_page(file_path, page_num, page_bytes):
     if not os.path.exists(file_path):
         with open(file_path, "wb") as f:
@@ -13,6 +22,8 @@ def  write_page(file_path, page_num, page_bytes):
 
         
 def read_page(file_path, page_num):
+    global _disk_read_count
+    _disk_read_count += 1
     if not os.path.exists(file_path):
         return init_page()
     
